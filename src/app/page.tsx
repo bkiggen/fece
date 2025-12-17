@@ -1,11 +1,33 @@
 import Link from "next/link";
-import { getAllYears, getYearData } from "@/data/songs";
+import { prisma } from "@/lib/prisma";
 import Playlist from "@/components/Playlist";
 
-export default function Home() {
-  const years = getAllYears();
+export const dynamic = "force-dynamic";
+
+export default async function Home() {
+  const years = await prisma.year.findMany({
+    orderBy: { year: "desc" },
+  });
+
   const currentYear = 2025;
-  const currentYearData = getYearData(currentYear);
+  const currentYearData = await prisma.year.findUnique({
+    where: { year: currentYear },
+    include: {
+      songs: {
+        orderBy: { createdAt: "asc" },
+      },
+    },
+  });
+
+  const currentYearSongs = currentYearData?.songs.map((song) => ({
+    id: song.id.toString(),
+    title: song.title,
+    fartist: song.fartist,
+    bio: song.bio || "",
+    lyrics: song.lyrics || "",
+    audioUrl: song.audioUrl,
+    year: currentYear,
+  })) || [];
 
   return (
     <div className="min-h-screen">
@@ -26,6 +48,9 @@ export default function Home() {
             <span className="highlight-yellow">SONG SUBMISSIONS are OPEN</span>{" "}
             for 2025 / FECE 15!!!
           </p>
+          <Link href="/submit" className="btn-chaos lime no-underline">
+            SUBMIT YOUR SONG
+          </Link>
         </div>
 
         {/* Scroll indicator */}
@@ -35,13 +60,13 @@ export default function Home() {
       </section>
 
       {/* Current Year Playlist */}
-      {currentYearData && (
+      {currentYearSongs.length > 0 && (
         <section className="section-purple py-20 px-4">
           <div className="max-w-4xl mx-auto">
             <h2 className="big-text text-center mb-8">
               <span className="highlight-lime">LISTEN NOW</span>
             </h2>
-            <Playlist songs={currentYearData.songs} year={currentYear} />
+            <Playlist songs={currentYearSongs} year={currentYear} />
             <div className="text-center mt-8">
               <Link href={`/years/${currentYear}`} className="btn-chaos pink no-underline">
                 VIEW FULL {currentYear} PAGE
@@ -83,10 +108,10 @@ export default function Home() {
 
             <div className="bg-white/10 p-6 border-4 border-[#F2FF3D]">
               <p className="font-bold">
-                <span className="highlight-yellow">SEND TO:</span>{" "}
-                <a href="mailto:kaya.blauvelt@gmail.com" className="underline hover:text-[#C6FF5D]">
-                  kaya.blauvelt@gmail.com
-                </a>
+                <span className="highlight-yellow">SUBMIT:</span>{" "}
+                <Link href="/submit" className="underline hover:text-[#C6FF5D]">
+                  Use our submission form
+                </Link>
               </p>
             </div>
 
@@ -98,12 +123,9 @@ export default function Home() {
           </div>
 
           <div className="text-center mt-12">
-            <a
-              href="mailto:kaya.blauvelt@gmail.com?subject=FECE ON EARTH 2025 Submission"
-              className="btn-chaos lime"
-            >
+            <Link href="/submit" className="btn-chaos lime no-underline">
               SUBMIT YOUR SONG
-            </a>
+            </Link>
           </div>
         </div>
       </section>
@@ -132,9 +154,9 @@ export default function Home() {
           </p>
 
           <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
-            {years.map((year) => (
-              <Link key={year} href={`/years/${year}`} className="year-card chaos-hover">
-                {year}
+            {years.map((yearData) => (
+              <Link key={yearData.id} href={`/years/${yearData.year}`} className="year-card chaos-hover">
+                {yearData.year}
               </Link>
             ))}
           </div>

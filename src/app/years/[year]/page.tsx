@@ -3,17 +3,12 @@ import { notFound } from "next/navigation";
 import Header from "@/components/Header";
 import SongCard from "@/components/SongCard";
 import DownloadAllButton from "@/components/DownloadAllButton";
-import { getYearData, getAllYears } from "@/data/songs";
+import { prisma } from "@/lib/prisma";
+
+export const dynamic = "force-dynamic";
 
 interface YearPageProps {
   params: Promise<{ year: string }>;
-}
-
-export async function generateStaticParams() {
-  const years = getAllYears();
-  return years.map((year) => ({
-    year: year.toString(),
-  }));
 }
 
 export async function generateMetadata({ params }: YearPageProps) {
@@ -26,17 +21,41 @@ export async function generateMetadata({ params }: YearPageProps) {
 
 export default async function YearPage({ params }: YearPageProps) {
   const { year: yearParam } = await params;
-  const year = parseInt(yearParam, 10);
-  const yearData = getYearData(year);
+  const yearNum = parseInt(yearParam, 10);
+
+  const yearData = await prisma.year.findUnique({
+    where: { year: yearNum },
+    include: {
+      songs: {
+        orderBy: { createdAt: "asc" },
+      },
+    },
+  });
 
   if (!yearData) {
     notFound();
   }
 
-  const allYears = getAllYears();
-  const currentIndex = allYears.indexOf(year);
-  const prevYear = currentIndex < allYears.length - 1 ? allYears[currentIndex + 1] : null;
-  const nextYear = currentIndex > 0 ? allYears[currentIndex - 1] : null;
+  const allYears = await prisma.year.findMany({
+    orderBy: { year: "desc" },
+    select: { year: true },
+  });
+
+  const yearsList = allYears.map((y) => y.year);
+  const currentIndex = yearsList.indexOf(yearNum);
+  const prevYear = currentIndex < yearsList.length - 1 ? yearsList[currentIndex + 1] : null;
+  const nextYear = currentIndex > 0 ? yearsList[currentIndex - 1] : null;
+
+  // Transform songs for components
+  const songs = yearData.songs.map((song) => ({
+    id: song.id.toString(),
+    title: song.title,
+    fartist: song.fartist,
+    bio: song.bio || "",
+    lyrics: song.lyrics || "",
+    audioUrl: song.audioUrl,
+    year: yearNum,
+  }));
 
   return (
     <div className="min-h-screen bg-[#532563]">
@@ -60,25 +79,25 @@ export default async function YearPage({ params }: YearPageProps) {
           {/* Year Header */}
           <header className="text-center mb-12">
             <h1 className="big-text glitch-text mb-4">
-              <span className="highlight-yellow">{year}</span>
+              <span className="highlight-yellow">{yearNum}</span>
             </h1>
             {yearData.description && (
               <p className="text-white/80 text-xl">{yearData.description}</p>
             )}
             <p className="text-[#C6FF5D] mt-4 text-xl font-bold">
-              {yearData.songs.length} {yearData.songs.length === 1 ? "SONG" : "SONGS"}
+              {songs.length} {songs.length === 1 ? "SONG" : "SONGS"}
             </p>
-            {yearData.songs.length > 0 && (
+            {songs.length > 0 && (
               <div className="mt-6">
-                <DownloadAllButton songs={yearData.songs} year={year} />
+                <DownloadAllButton songs={songs} year={yearNum} />
               </div>
             )}
           </header>
 
           {/* Songs List */}
-          {yearData.songs.length > 0 ? (
+          {songs.length > 0 ? (
             <div className="space-y-8">
-              {yearData.songs.map((song) => (
+              {songs.map((song) => (
                 <SongCard key={song.id} song={song} />
               ))}
             </div>
@@ -88,7 +107,7 @@ export default async function YearPage({ params }: YearPageProps) {
                 No songs available for this year yet.
               </p>
               <p className="text-[#532563]/70 mt-2">
-                Check back later or contact us if you have recordings from {year}!
+                Check back later or contact us if you have recordings from {yearNum}!
               </p>
             </div>
           )}

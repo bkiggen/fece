@@ -1,0 +1,51 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Year {
+  id          Int      @id @default(autoincrement())
+  year        Int      @unique
+  description String?
+  songs       Song[]
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model Song {
+  id        Int      @id @default(autoincrement())
+  title     String
+  fartist   String
+  bio       String?
+  lyrics    String?
+  audioUrl  String
+  year      Year     @relation(fields: [yearId], references: [id])
+  yearId    Int
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Submission {
+  id            Int              @id @default(autoincrement())
+  title         String
+  fartist       String
+  email         String?
+  bio           String?
+  lyrics        String?
+  audioUrl      String
+  audioFileName String?
+  status        SubmissionStatus @default(PENDING)
+  targetYear    Int?
+  createdAt     DateTime         @default(now())
+  updatedAt     DateTime         @updatedAt
+}
+
+enum SubmissionStatus {
+  PENDING
+  APPROVED
+  REJECTED
+}
