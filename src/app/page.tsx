@@ -33,20 +33,21 @@ export default async function Home() {
     <div className="min-h-screen">
       {/* Hero Section */}
       <section className="min-h-screen flex flex-col items-center justify-center px-4 py-12 tropical-bg relative overflow-hidden">
-        {/* Logo */}
-        <div className="text-center mb-8">
-          <h1 className="big-text glitch-text mb-4">
-            <span className="logo-fece">FECE</span>{" "}
-            <span className="logo-on">ON</span>{" "}
+        {/* Logo - Ramshackle Collage Style */}
+        <div className="logo-container mb-8">
+          <h1 className="flex flex-col items-center" style={{ fontSize: 'clamp(3rem, 12vw, 8rem)', fontWeight: 800, lineHeight: 0.9 }}>
+            <span className="logo-fece">FECE</span>
+            <span className="logo-on">ON</span>
             <span className="logo-earth">EARTH</span>
           </h1>
+          <span className="logo-year">{currentYear}</span>
         </div>
 
         {/* Main announcement */}
         <div className="max-w-4xl mx-auto text-center">
           <p className="medium-text mb-8">
             <span className="highlight-yellow">SONG SUBMISSIONS are OPEN</span>{" "}
-            for 2025 / FECE 15!!!
+            for {currentYear} / FECE 15!!!
           </p>
           <Link href="/submit" className="btn-chaos lime no-underline">
             SUBMIT YOUR SONG
@@ -94,19 +95,19 @@ export default async function Home() {
           </h2>
 
           <div className="space-y-8 text-xl md:text-2xl">
-            <div className="bg-white/10 p-6 border-4 border-[#C6FF5D]">
+            <div className="bg-white/10 border-4 border-[#C6FF5D]" style={{ padding: '18px 28px 24px 22px' }}>
               <p className="font-bold">
                 <span className="highlight-lime">FORMAT:</span> MP3 or MP4 audio files
               </p>
             </div>
 
-            <div className="bg-white/10 p-6 border-4 border-[#F5A6EC]">
+            <div className="bg-white/10 border-4 border-[#F5A6EC]" style={{ marginLeft: '8px', padding: '22px 20px 18px 30px' }}>
               <p className="font-bold">
                 <span className="highlight-pink">INCLUDE:</span> Song title, your &quot;Fartist&quot; name, a short bio, and lyrics
               </p>
             </div>
 
-            <div className="bg-white/10 p-6 border-4 border-[#F2FF3D]">
+            <div className="bg-white/10 border-4 border-[#F2FF3D]" style={{ marginLeft: '-5px', padding: '16px 26px 22px 18px' }}>
               <p className="font-bold">
                 <span className="highlight-yellow">SUBMIT:</span>{" "}
                 <Link href="/submit" className="underline hover:text-[#C6FF5D]">
@@ -115,7 +116,7 @@ export default async function Home() {
               </p>
             </div>
 
-            <div className="bg-white/10 p-6 border-4 border-[#C6FF5D]">
+            <div className="bg-white/10 border-4 border-[#C6FF5D]" style={{ marginLeft: '12px', padding: '20px 24px 26px 28px' }}>
               <p className="font-bold">
                 <span className="highlight-lime">DEADLINE:</span> Check back for 2025 deadline!
               </p>
@@ -182,10 +183,10 @@ export default async function Home() {
       {/* Footer */}
       <footer className="section-purple py-12 px-4 border-t-4 border-[#C6FF5D]">
         <div className="max-w-4xl mx-auto text-center">
-          <div className="mb-6">
-            <span className="logo-fece text-2xl">FECE</span>{" "}
-            <span className="logo-on text-2xl">ON</span>{" "}
-            <span className="logo-earth text-2xl">EARTH</span>
+          <div className="mb-6 flex justify-center items-baseline gap-1">
+            <span className="bg-[#C6FF5D] text-[#532563] text-2xl font-bold px-3 py-1">FECE</span>
+            <span className="bg-[#532563] text-white text-lg font-bold px-2 py-1 border-2 border-white" style={{ marginLeft: '10px', marginTop: '-8px' }}>ON</span>
+            <span className="bg-[#F5A6EC] text-[#C6FF5D] text-2xl font-bold px-3 py-1" style={{ marginLeft: '-6px' }}>EARTH</span>
           </div>
           <p className="text-lg opacity-80 mb-4">
             An annual holiday song compilation since 2011

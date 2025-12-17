@@ -26,7 +26,9 @@ export default function SantaDashboard() {
         const years = await yearsRes.json();
 
         setStats({
-          pendingSubmissions: submissions.filter((s: { status: string }) => s.status === "PENDING").length,
+          pendingSubmissions: submissions.filter(
+            (s: { status: string }) => s.status === "PENDING"
+          ).length,
           totalSongs: songs.length,
           totalYears: years.length,
         });
@@ -44,7 +46,7 @@ export default function SantaDashboard() {
       <header className="bg-[#C6FF5D] border-b-4 border-black p-4">
         <div className="max-w-6xl mx-auto flex items-center justify-between">
           <h1 className="text-2xl font-bold text-[#532563]">
-            SANTA&apos;S WORKSHOP
+            THE FART FACTORY
           </h1>
           <Link href="/" className="text-[#532563] hover:underline font-bold">
             View Site &rarr;
@@ -59,7 +61,9 @@ export default function SantaDashboard() {
             href="/santa/submissions"
             className="bg-[#F5A6EC] border-4 border-black p-6 hover:translate-x-1 hover:-translate-y-1 hover:shadow-[4px_4px_0_black] transition-all no-underline"
           >
-            <h2 className="text-lg font-bold text-[#532563] mb-2">PENDING SUBMISSIONS</h2>
+            <h2 className="text-lg font-bold text-[#532563] mb-2">
+              PENDING SUBMISSIONS
+            </h2>
             <p className="text-5xl font-bold text-[#532563]">
               {stats?.pendingSubmissions ?? "..."}
             </p>
@@ -69,7 +73,9 @@ export default function SantaDashboard() {
             href="/santa/songs"
             className="bg-[#C6FF5D] border-4 border-black p-6 hover:translate-x-1 hover:-translate-y-1 hover:shadow-[4px_4px_0_black] transition-all no-underline"
           >
-            <h2 className="text-lg font-bold text-[#532563] mb-2">TOTAL SONGS</h2>
+            <h2 className="text-lg font-bold text-[#532563] mb-2">
+              TOTAL SONGS
+            </h2>
             <p className="text-5xl font-bold text-[#532563]">
               {stats?.totalSongs ?? "..."}
             </p>
@@ -88,7 +94,9 @@ export default function SantaDashboard() {
 
         {/* Quick Links */}
         <div className="bg-white border-4 border-black p-8">
-          <h2 className="text-2xl font-bold text-[#532563] mb-6">QUICK ACTIONS</h2>
+          <h2 className="text-2xl font-bold text-[#532563] mb-6">
+            QUICK ACTIONS
+          </h2>
           <div className="grid md:grid-cols-2 gap-4">
             <Link
               href="/santa/submissions"

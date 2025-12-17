@@ -11,9 +11,9 @@ export default function Header() {
       <nav className="max-w-6xl mx-auto px-4 py-3">
         <div className="flex items-center justify-between">
           <Link href="/" className="flex items-center gap-1 text-lg font-bold no-underline">
-            <span className="logo-fece text-lg">FECE</span>
-            <span className="logo-on text-lg">ON</span>
-            <span className="logo-earth text-lg">EARTH</span>
+            <span className="bg-[#C6FF5D] text-[#532563] px-2 py-1">FECE</span>
+            <span className="bg-[#532563] text-white text-sm px-2 py-1" style={{ marginLeft: '8px', marginTop: '-6px' }}>ON</span>
+            <span className="bg-[#F5A6EC] text-[#C6FF5D] px-2 py-1" style={{ marginLeft: '-4px' }}>EARTH</span>
           </Link>
 
           {/* Desktop Navigation */}

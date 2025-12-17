@@ -154,10 +154,10 @@ export default async function YearPage({ params }: YearPageProps) {
 
       {/* Footer */}
       <footer className="py-8 px-4 border-t-4 border-[#C6FF5D] text-center">
-        <div className="mb-4">
-          <span className="logo-fece text-xl">FECE</span>{" "}
-          <span className="logo-on text-xl">ON</span>{" "}
-          <span className="logo-earth text-xl">EARTH</span>
+        <div className="mb-4 flex justify-center items-baseline gap-1">
+          <span className="bg-[#C6FF5D] text-[#532563] text-xl font-bold px-3 py-1">FECE</span>
+          <span className="bg-[#532563] text-white text-base font-bold px-2 py-1 border-2 border-white" style={{ marginLeft: '8px', marginTop: '-6px' }}>ON</span>
+          <span className="bg-[#F5A6EC] text-[#C6FF5D] text-xl font-bold px-3 py-1" style={{ marginLeft: '-4px' }}>EARTH</span>
         </div>
         <p className="opacity-60">
           <a href="mailto:kaya.blauvelt@gmail.com" className="hover:text-[#C6FF5D]">
