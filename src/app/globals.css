@@ -1,0 +1,361 @@
+@import url('https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,200..800&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --purple: #532563;
+  --lime: #C6FF5D;
+  --pink: #F5A6EC;
+  --red: #FF4040;
+  --yellow: #F2FF3D;
+  --cyan: #00FFFF;
+  --white: #FFFFFF;
+  --black: #000000;
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  font-family: 'Bricolage Grotesque', sans-serif;
+  line-height: 1.4;
+  background: var(--purple);
+  color: var(--white);
+  overflow-x: hidden;
+}
+
+/* Glitch text effect for logo */
+.glitch-text {
+  text-shadow:
+    3px 3px 0 var(--cyan),
+    -3px -3px 0 var(--red);
+  animation: glitch 0.3s infinite;
+}
+
+@keyframes glitch {
+  0%, 100% {
+    text-shadow:
+      3px 3px 0 var(--cyan),
+      -3px -3px 0 var(--red);
+  }
+  25% {
+    text-shadow:
+      -3px 3px 0 var(--cyan),
+      3px -3px 0 var(--red);
+  }
+  50% {
+    text-shadow:
+      3px -3px 0 var(--cyan),
+      -3px 3px 0 var(--red);
+  }
+  75% {
+    text-shadow:
+      -3px -3px 0 var(--cyan),
+      3px 3px 0 var(--red);
+  }
+}
+
+/* Logo styles */
+.logo-fece {
+  background: var(--lime);
+  color: var(--purple);
+  padding: 0.2em 0.3em;
+  display: inline-block;
+}
+
+.logo-on {
+  background: var(--purple);
+  color: var(--white);
+  padding: 0.2em 0.3em;
+  display: inline-block;
+  border: 3px solid var(--white);
+}
+
+.logo-earth {
+  background: var(--pink);
+  color: var(--lime);
+  padding: 0.2em 0.3em;
+  display: inline-block;
+  text-shadow: 2px 2px 0 var(--purple);
+}
+
+/* Highlighted text */
+.highlight-yellow {
+  background: var(--yellow);
+  color: var(--purple);
+  padding: 0.1em 0.3em;
+  font-weight: 700;
+}
+
+.highlight-lime {
+  background: var(--lime);
+  color: var(--purple);
+  padding: 0.1em 0.3em;
+  font-weight: 700;
+}
+
+.highlight-pink {
+  background: var(--pink);
+  color: var(--purple);
+  padding: 0.1em 0.3em;
+  font-weight: 700;
+}
+
+/* Section backgrounds */
+.section-purple {
+  background: var(--purple);
+}
+
+.section-pink {
+  background: var(--pink);
+}
+
+.section-lime {
+  background: var(--lime);
+  color: var(--purple);
+}
+
+/* Video background container */
+.video-bg {
+  position: relative;
+  overflow: hidden;
+}
+
+.video-bg video {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  min-width: 100%;
+  min-height: 100%;
+  transform: translate(-50%, -50%);
+  z-index: -1;
+  object-fit: cover;
+}
+
+.video-bg::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(83, 37, 99, 0.6);
+  z-index: -1;
+}
+
+/* Tropical/nature background patterns */
+.tropical-bg {
+  background:
+    linear-gradient(135deg, rgba(83, 37, 99, 0.9) 0%, rgba(245, 166, 236, 0.8) 100%),
+    url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23C6FF5D' fill-opacity='0.1'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+}
+
+/* Big bold text */
+.big-text {
+  font-size: clamp(2rem, 8vw, 6rem);
+  font-weight: 800;
+  line-height: 1.1;
+  letter-spacing: -0.02em;
+}
+
+.medium-text {
+  font-size: clamp(1.5rem, 4vw, 3rem);
+  font-weight: 700;
+  line-height: 1.2;
+}
+
+/* Chaotic hover effects */
+.chaos-hover {
+  transition: transform 0.2s ease;
+}
+
+.chaos-hover:hover {
+  transform: rotate(-3deg) scale(1.05);
+}
+
+/* Button styles */
+.btn-chaos {
+  display: inline-block;
+  padding: 1em 2em;
+  font-weight: 800;
+  font-size: 1.2rem;
+  text-transform: uppercase;
+  border: 4px solid var(--black);
+  box-shadow: 6px 6px 0 var(--black);
+  transition: all 0.15s ease;
+  cursor: pointer;
+  text-decoration: none;
+}
+
+.btn-chaos:hover {
+  transform: translate(3px, 3px);
+  box-shadow: 3px 3px 0 var(--black);
+}
+
+.btn-chaos.lime {
+  background: var(--lime);
+  color: var(--purple);
+}
+
+.btn-chaos.pink {
+  background: var(--pink);
+  color: var(--purple);
+}
+
+.btn-chaos.yellow {
+  background: var(--yellow);
+  color: var(--purple);
+}
+
+/* Year card styles - geocities chaos */
+.year-card {
+  background: var(--lime);
+  color: var(--purple);
+  border: 4px solid var(--black);
+  padding: 1.5rem;
+  text-align: center;
+  font-weight: 800;
+  font-size: 1.5rem;
+  box-shadow: 5px 5px 0 var(--black);
+  transition: all 0.2s ease;
+  text-decoration: none;
+  display: block;
+}
+
+.year-card:nth-child(2n) {
+  background: var(--pink);
+}
+
+.year-card:nth-child(3n) {
+  background: var(--yellow);
+}
+
+.year-card:hover {
+  transform: translate(-3px, -3px);
+  box-shadow: 8px 8px 0 var(--black);
+}
+
+/* Song card */
+.song-card {
+  background: var(--white);
+  color: var(--purple);
+  border: 4px solid var(--black);
+  box-shadow: 6px 6px 0 var(--black);
+  padding: 1.5rem;
+}
+
+/* Input styles */
+input[type="email"],
+input[type="text"] {
+  border: 3px solid var(--black);
+  padding: 0.75em 1em;
+  font-family: 'Bricolage Grotesque', sans-serif;
+  font-size: 1rem;
+  width: 100%;
+  background: var(--white);
+  color: var(--black);
+}
+
+input[type="email"]:focus,
+input[type="text"]:focus {
+  outline: none;
+  box-shadow: 4px 4px 0 var(--lime);
+}
+
+/* Marquee animation */
+@keyframes marquee {
+  0% { transform: translateX(0); }
+  100% { transform: translateX(-50%); }
+}
+
+.marquee {
+  animation: marquee 20s linear infinite;
+}
+
+/* Blink animation for geocities feel */
+@keyframes blink {
+  0%, 50% { opacity: 1; }
+  51%, 100% { opacity: 0; }
+}
+
+.blink {
+  animation: blink 1s step-end infinite;
+}
+
+/* Wobble animation */
+@keyframes wobble {
+  0%, 100% { transform: rotate(-2deg); }
+  50% { transform: rotate(2deg); }
+}
+
+.wobble {
+  animation: wobble 0.5s ease-in-out infinite;
+}
+
+/* Audio player customization */
+audio {
+  width: 100%;
+  border-radius: 0;
+}
+
+audio::-webkit-media-controls-panel {
+  background: var(--lime);
+}
+
+/* Decorative elements */
+.star {
+  display: inline-block;
+  color: var(--yellow);
+  font-size: 2rem;
+  animation: wobble 1s ease-in-out infinite;
+}
+
+/* Scrollbar */
+::-webkit-scrollbar {
+  width: 12px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--purple);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--lime);
+  border: 2px solid var(--purple);
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--pink);
+}
+
+/* Link styles */
+a {
+  color: inherit;
+  text-decoration: underline;
+  text-decoration-thickness: 3px;
+  text-underline-offset: 3px;
+}
+
+a:hover {
+  text-decoration-color: var(--lime);
+}
+
+/* Responsive utilities */
+@media (max-width: 768px) {
+  .big-text {
+    font-size: 2.5rem;
+  }
+
+  .medium-text {
+    font-size: 1.5rem;
+  }
+}
