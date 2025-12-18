@@ -1,7 +1,6 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
-import { unlink, rename, mkdir } from "fs/promises";
-import path from "path";
+import { deleteFromR2 } from "@/lib/r2";
 
 export async function GET(
   request: Request,
@@ -32,7 +31,7 @@ export async function PATCH(
     const { id } = await params;
     const body = await request.json();
 
-    // If approving, create a song and move the audio file
+    // If approving, create a song (audio stays in R2)
     if (body.status === "APPROVED" && body.yearId) {
       const submission = await prisma.submission.findUnique({
         where: { id: parseInt(id) },
@@ -51,29 +50,14 @@ export async function PATCH(
         return NextResponse.json({ error: "Year not found" }, { status: 404 });
       }
 
-      // Move audio file from submissions to main audio folder
-      const oldPath = path.join(process.cwd(), "public", submission.audioUrl);
-      const newFileName = `${submission.fartist} - ${submission.title}.mp3`;
-      const newDir = path.join(process.cwd(), "public", "audio");
-      await mkdir(newDir, { recursive: true });
-      const newPath = path.join(newDir, newFileName);
-      const newAudioUrl = `/audio/${newFileName}`;
-
-      try {
-        await rename(oldPath, newPath);
-      } catch {
-        // If rename fails (cross-device), the file might already be in place
-        console.log("Could not move file, using original path");
-      }
-
-      // Create the song
+      // Create the song using the existing R2 URL
       await prisma.song.create({
         data: {
           title: submission.title,
           fartist: submission.fartist,
           bio: submission.bio || "",
           lyrics: submission.lyrics || "",
-          audioUrl: newAudioUrl,
+          audioUrl: submission.audioUrl,
           yearId: body.yearId,
         },
       });
@@ -124,12 +108,11 @@ export async function DELETE(
       return NextResponse.json({ error: "Submission not found" }, { status: 404 });
     }
 
-    // Delete the audio file
+    // Delete the audio file from R2
     try {
-      const filePath = path.join(process.cwd(), "public", submission.audioUrl);
-      await unlink(filePath);
+      await deleteFromR2(submission.audioUrl);
     } catch {
-      console.log("Could not delete audio file");
+      console.log("Could not delete audio file from R2");
     }
 
     // Delete the submission

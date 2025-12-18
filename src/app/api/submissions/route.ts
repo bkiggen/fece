@@ -1,7 +1,6 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
-import { writeFile, mkdir } from "fs/promises";
-import path from "path";
+import { uploadToR2 } from "@/lib/r2";
 
 export async function GET() {
   try {
@@ -33,22 +32,16 @@ export async function POST(request: Request) {
       );
     }
 
-    // Create submissions directory if it doesn't exist
-    const uploadsDir = path.join(process.cwd(), "public", "audio", "submissions");
-    await mkdir(uploadsDir, { recursive: true });
-
     // Generate unique filename
-    const timestamp = Date.now();
     const sanitizedFartist = fartist.replace(/[^a-zA-Z0-9]/g, "_");
     const sanitizedTitle = title.replace(/[^a-zA-Z0-9]/g, "_");
-    const ext = path.extname(audioFile.name) || ".mp3";
-    const fileName = `${timestamp}_${sanitizedFartist}_${sanitizedTitle}${ext}`;
+    const ext = audioFile.name.split('.').pop() || "mp3";
+    const fileName = `${sanitizedFartist}_${sanitizedTitle}.${ext}`;
 
-    // Save file
+    // Upload to R2
     const bytes = await audioFile.arrayBuffer();
     const buffer = Buffer.from(bytes);
-    const filePath = path.join(uploadsDir, fileName);
-    await writeFile(filePath, buffer);
+    const audioUrl = await uploadToR2(buffer, fileName, audioFile.type || "audio/mpeg");
 
     // Create submission record
     const submission = await prisma.submission.create({
@@ -58,7 +51,7 @@ export async function POST(request: Request) {
         email: email || null,
         bio: bio || null,
         lyrics: lyrics || null,
-        audioUrl: `/audio/submissions/${fileName}`,
+        audioUrl,
         audioFileName: audioFile.name,
       },
     });
