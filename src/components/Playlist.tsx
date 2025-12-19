@@ -110,6 +110,64 @@ export default function Playlist({ songs, year }: PlaylistProps) {
     }
   };
 
+  const handleNextTrack = () => {
+    if (!playlistMode || currentTrackIndex === null) return;
+
+    // Pause current track
+    playlistRefs.current[currentTrackIndex]?.pause();
+
+    let nextIndex: number | null;
+
+    if (shuffleMode) {
+      const newPlayedIndices = new Set(playedIndices);
+      newPlayedIndices.add(currentTrackIndex);
+      nextIndex = getRandomUnplayedIndex(newPlayedIndices);
+
+      if (nextIndex !== null) {
+        setPlayedIndices(newPlayedIndices);
+        setCurrentTrackIndex(nextIndex);
+        setTimeout(() => {
+          playlistRefs.current[nextIndex!]?.play();
+        }, 100);
+      } else {
+        // All tracks played
+        handleStopPlaylist();
+      }
+    } else {
+      nextIndex = currentTrackIndex + 1;
+      if (nextIndex < songs.length) {
+        setCurrentTrackIndex(nextIndex);
+        setTimeout(() => {
+          playlistRefs.current[nextIndex]?.play();
+        }, 100);
+      } else {
+        // End of playlist
+        handleStopPlaylist();
+      }
+    }
+  };
+
+  const handlePreviousTrack = () => {
+    if (!playlistMode || currentTrackIndex === null) return;
+
+    // Pause current track
+    playlistRefs.current[currentTrackIndex]?.pause();
+
+    const prevIndex = currentTrackIndex - 1;
+    if (prevIndex >= 0) {
+      setCurrentTrackIndex(prevIndex);
+      // In shuffle mode, remove from played indices to allow replay
+      if (shuffleMode) {
+        const newPlayedIndices = new Set(playedIndices);
+        newPlayedIndices.delete(prevIndex);
+        setPlayedIndices(newPlayedIndices);
+      }
+      setTimeout(() => {
+        playlistRefs.current[prevIndex]?.play();
+      }, 100);
+    }
+  };
+
   const setAudioRef = (index: number, element: HTMLAudioElement | null) => {
     playlistRefs.current[index] = element;
   };
@@ -133,43 +191,68 @@ export default function Playlist({ songs, year }: PlaylistProps) {
             <p className="text-[#532563]/70">{songs.length} {songs.length === 1 ? "track" : "tracks"}</p>
           </div>
 
-          {/* Play All / Stop button */}
-          <button
-            onClick={playlistMode ? handleStopPlaylist : handlePlayAll}
-            className="bg-[#532563] hover:bg-[#F5A6EC] text-white font-bold px-6 py-3 border-4 border-black transition-colors flex items-center gap-2"
-          >
-            {playlistMode ? (
-              <>
-                <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
-                  <rect x="6" y="4" width="12" height="16" />
+          {/* Playback controls */}
+          <div className="flex items-center gap-2">
+            {/* Shuffle button */}
+            <button
+              onClick={toggleShuffle}
+              className={`w-12 h-12 border-4 border-black transition-colors flex items-center justify-center ${
+                shuffleMode
+                  ? 'bg-[#F5A6EC] hover:bg-[#F5A6EC]/80 text-[#532563]'
+                  : 'bg-white hover:bg-[#F2FF3D] text-[#532563]'
+              }`}
+              title="Shuffle"
+              aria-label="Toggle shuffle"
+            >
+              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2.5}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M3 12h4l3-9 4 18 3-9h4M17 8l4 4-4 4M3 16h4l3-9 4 18 3-9h4" />
+              </svg>
+            </button>
+
+            {/* Previous track button */}
+            <button
+              onClick={handlePreviousTrack}
+              disabled={!playlistMode || currentTrackIndex === null || currentTrackIndex === 0}
+              className="w-12 h-12 bg-white hover:bg-[#F2FF3D] disabled:opacity-30 disabled:hover:bg-white text-[#532563] border-4 border-black transition-colors flex items-center justify-center"
+              title="Previous track"
+              aria-label="Previous track"
+            >
+              <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
+                <path d="M6 6h2v12H6zm3.5 6l8.5 6V6z"/>
+              </svg>
+            </button>
+
+            {/* Play/Stop button */}
+            <button
+              onClick={playlistMode ? handleStopPlaylist : handlePlayAll}
+              className="w-14 h-14 bg-[#532563] hover:bg-[#F5A6EC] text-white border-4 border-black transition-colors flex items-center justify-center"
+              title={playlistMode ? "Stop" : "Play all"}
+              aria-label={playlistMode ? "Stop playlist" : "Play all"}
+            >
+              {playlistMode ? (
+                <svg className="w-6 h-6" fill="currentColor" viewBox="0 0 24 24">
+                  <rect x="6" y="6" width="12" height="12" />
                 </svg>
-                STOP
-              </>
-            ) : (
-              <>
-                <svg className="w-5 h-5 ml-0.5" fill="currentColor" viewBox="0 0 24 24">
+              ) : (
+                <svg className="w-6 h-6 ml-1" fill="currentColor" viewBox="0 0 24 24">
                   <path d="M8 5v14l11-7z" />
                 </svg>
-                PLAY ALL
-              </>
-            )}
-          </button>
+              )}
+            </button>
 
-          {/* Shuffle toggle button */}
-          <button
-            onClick={toggleShuffle}
-            className={`font-bold px-6 py-3 border-4 border-black transition-colors flex items-center gap-2 ${
-              shuffleMode
-                ? 'bg-[#F5A6EC] hover:bg-[#F5A6EC]/80 text-[#532563]'
-                : 'bg-white hover:bg-[#F2FF3D] text-[#532563]'
-            }`}
-            title="Toggle shuffle mode"
-          >
-            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2.5}>
-              <path strokeLinecap="round" strokeLinejoin="round" d="M3 7v10M21 7v10M16 17l5-5-5-5M8 7L3 12l5 5" />
-            </svg>
-            {shuffleMode ? 'SHUFFLE ON' : 'SHUFFLE'}
-          </button>
+            {/* Next track button */}
+            <button
+              onClick={handleNextTrack}
+              disabled={!playlistMode || currentTrackIndex === null}
+              className="w-12 h-12 bg-white hover:bg-[#F2FF3D] disabled:opacity-30 disabled:hover:bg-white text-[#532563] border-4 border-black transition-colors flex items-center justify-center"
+              title="Next track"
+              aria-label="Next track"
+            >
+              <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
+                <path d="M6 18l8.5-6L6 6v12zM16 6v12h2V6h-2z"/>
+              </svg>
+            </button>
+          </div>
         </div>
 
         <DownloadAllButton songs={songs} year={year} />
