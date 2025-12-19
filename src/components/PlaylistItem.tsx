@@ -1,18 +1,36 @@
 "use client";
 
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import { Song } from "@/data/types";
 
 interface PlaylistItemProps {
   song: Song;
   index: number;
+  isCurrentTrack?: boolean;
+  playlistMode?: boolean;
+  onTrackEnd?: () => void;
+  setAudioRef?: (element: HTMLAudioElement | null) => void;
 }
 
-export default function PlaylistItem({ song, index }: PlaylistItemProps) {
+export default function PlaylistItem({
+  song,
+  index,
+  isCurrentTrack = false,
+  playlistMode = false,
+  onTrackEnd,
+  setAudioRef
+}: PlaylistItemProps) {
   const [isPlaying, setIsPlaying] = useState(false);
   const [currentTime, setCurrentTime] = useState(0);
   const [duration, setDuration] = useState(0);
   const audioRef = useRef<HTMLAudioElement>(null);
+
+  // Pass audio ref to parent
+  useEffect(() => {
+    if (setAudioRef && audioRef.current) {
+      setAudioRef(audioRef.current);
+    }
+  }, [setAudioRef]);
 
   const togglePlay = () => {
     const audio = audioRef.current;
@@ -48,24 +66,41 @@ export default function PlaylistItem({ song, index }: PlaylistItemProps) {
     audio.currentTime = percent * duration;
   };
 
+  const handleEnded = () => {
+    setIsPlaying(false);
+    if (onTrackEnd) {
+      onTrackEnd();
+    }
+  };
+
   return (
-    <div className="bg-white border-4 border-black p-3 hover:bg-[#F2FF3D]/20 transition-colors">
+    <div
+      className={`border-4 border-black p-3 transition-colors ${
+        isCurrentTrack
+          ? 'bg-[#F5A6EC] hover:bg-[#F5A6EC]'
+          : 'bg-white hover:bg-[#F2FF3D]/20'
+      }`}
+    >
       <audio
         ref={audioRef}
         src={song.audioUrl}
         preload="metadata"
         onTimeUpdate={() => setCurrentTime(audioRef.current?.currentTime || 0)}
         onDurationChange={() => setDuration(audioRef.current?.duration || 0)}
-        onEnded={() => setIsPlaying(false)}
+        onEnded={handleEnded}
         onPlay={() => setIsPlaying(true)}
         onPause={() => setIsPlaying(false)}
       />
 
       <div className="flex items-center gap-3">
-        {/* Track number */}
-        <span className="text-[#532563] font-bold text-lg w-8 text-center">
-          {index + 1}
-        </span>
+        {/* Track number or NOW PLAYING indicator */}
+        <div className="w-8 text-center">
+          {isCurrentTrack ? (
+            <span className="text-[#532563] font-bold text-xs">▶</span>
+          ) : (
+            <span className="text-[#532563] font-bold text-lg">{index + 1}</span>
+          )}
+        </div>
 
         {/* Play button */}
         <button
