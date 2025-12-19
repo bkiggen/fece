@@ -116,25 +116,23 @@ export default function Playlist({ songs, year }: PlaylistProps) {
     // Pause current track
     playlistRefs.current[currentTrackIndex]?.pause();
 
-    let nextIndex: number | null;
-
     if (shuffleMode) {
       const newPlayedIndices = new Set(playedIndices);
       newPlayedIndices.add(currentTrackIndex);
-      nextIndex = getRandomUnplayedIndex(newPlayedIndices);
+      const nextIndex = getRandomUnplayedIndex(newPlayedIndices);
 
       if (nextIndex !== null) {
         setPlayedIndices(newPlayedIndices);
         setCurrentTrackIndex(nextIndex);
         setTimeout(() => {
-          playlistRefs.current[nextIndex!]?.play();
+          playlistRefs.current[nextIndex]?.play();
         }, 100);
       } else {
         // All tracks played
         handleStopPlaylist();
       }
     } else {
-      nextIndex = currentTrackIndex + 1;
+      const nextIndex = currentTrackIndex + 1;
       if (nextIndex < songs.length) {
         setCurrentTrackIndex(nextIndex);
         setTimeout(() => {
