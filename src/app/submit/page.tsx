@@ -8,22 +8,73 @@ export default function SubmitPage() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitted, setSubmitted] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [uploadProgress, setUploadProgress] = useState<string>("");
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setIsSubmitting(true);
     setError(null);
+    setUploadProgress("Preparing upload...");
 
     const formData = new FormData(e.currentTarget);
+    const audioFile = formData.get("audio") as File;
+
+    if (!audioFile) {
+      setError("Please select an audio file");
+      setIsSubmitting(false);
+      return;
+    }
 
     try {
-      const response = await fetch("/api/submissions", {
+      // Step 1: Get presigned upload URL
+      setUploadProgress("Getting upload URL...");
+      const urlResponse = await fetch("/api/upload-url", {
         method: "POST",
-        body: formData,
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          fileName: audioFile.name,
+          contentType: audioFile.type || "audio/mpeg",
+        }),
       });
 
-      if (!response.ok) {
-        const data = await response.json();
+      if (!urlResponse.ok) {
+        throw new Error("Failed to get upload URL");
+      }
+
+      const { uploadUrl, publicUrl } = await urlResponse.json();
+
+      // Step 2: Upload file directly to R2
+      setUploadProgress("Uploading audio file...");
+      const uploadResponse = await fetch(uploadUrl, {
+        method: "PUT",
+        body: audioFile,
+        headers: {
+          "Content-Type": audioFile.type || "audio/mpeg",
+        },
+      });
+
+      if (!uploadResponse.ok) {
+        throw new Error("Failed to upload audio file");
+      }
+
+      // Step 3: Submit form data with audio URL
+      setUploadProgress("Saving submission...");
+      const submissionResponse = await fetch("/api/submissions", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          title: formData.get("title"),
+          fartist: formData.get("fartist"),
+          email: formData.get("email") || null,
+          bio: formData.get("bio") || null,
+          lyrics: formData.get("lyrics") || null,
+          audioUrl: publicUrl,
+          audioFileName: audioFile.name,
+        }),
+      });
+
+      if (!submissionResponse.ok) {
+        const data = await submissionResponse.json();
         throw new Error(data.error || "Failed to submit");
       }
 
@@ -32,6 +83,7 @@ export default function SubmitPage() {
       setError(err instanceof Error ? err.message : "Something went wrong");
     } finally {
       setIsSubmitting(false);
+      setUploadProgress("");
     }
   };
 
@@ -176,7 +228,7 @@ export default function SubmitPage() {
                   disabled={isSubmitting}
                   className="btn-chaos lime w-full text-center disabled:opacity-50"
                 >
-                  {isSubmitting ? "UPLOADING HOT CRAP..." : "SUBMIT YOUR HOT CRAP"}
+                  {isSubmitting ? uploadProgress.toUpperCase() || "UPLOADING HOT CRAP..." : "SUBMIT YOUR HOT CRAP"}
                 </button>
               </div>
             </div>

@@ -1,4 +1,5 @@
 import { S3Client, PutObjectCommand, DeleteObjectCommand } from "@aws-sdk/client-s3";
+import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
 
 const R2_ACCOUNT_ID = process.env.R2_ACCOUNT_ID!;
 const R2_ACCESS_KEY_ID = process.env.R2_ACCESS_KEY_ID!;
@@ -46,6 +47,27 @@ export async function deleteFromR2(url: string): Promise<void> {
       Key: key,
     })
   );
+}
+
+export async function generatePresignedUploadUrl(
+  fileName: string,
+  contentType: string
+): Promise<{ uploadUrl: string; key: string; publicUrl: string }> {
+  const key = `audio/${Date.now()}-${fileName}`;
+
+  const command = new PutObjectCommand({
+    Bucket: R2_BUCKET_NAME,
+    Key: key,
+    ContentType: contentType,
+  });
+
+  const uploadUrl = await getSignedUrl(r2Client, command, {
+    expiresIn: 3600, // 1 hour
+  });
+
+  const publicUrl = `${R2_PUBLIC_URL}/${key}`;
+
+  return { uploadUrl, key, publicUrl };
 }
 
 export { r2Client, R2_BUCKET_NAME };

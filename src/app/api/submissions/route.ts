@@ -1,6 +1,5 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
-import { uploadToR2 } from "@/lib/r2";
 
 export async function GET() {
   try {
@@ -16,32 +15,16 @@ export async function GET() {
 
 export async function POST(request: Request) {
   try {
-    const formData = await request.formData();
+    const data = await request.json();
 
-    const title = formData.get("title") as string;
-    const fartist = formData.get("fartist") as string;
-    const email = formData.get("email") as string | null;
-    const bio = formData.get("bio") as string | null;
-    const lyrics = formData.get("lyrics") as string | null;
-    const audioFile = formData.get("audio") as File | null;
+    const { title, fartist, email, bio, lyrics, audioUrl, audioFileName } = data;
 
-    if (!title || !fartist || !audioFile) {
+    if (!title || !fartist || !audioUrl) {
       return NextResponse.json(
-        { error: "Title, fartist, and audio file are required" },
+        { error: "Title, fartist, and audioUrl are required" },
         { status: 400 }
       );
     }
-
-    // Generate unique filename
-    const sanitizedFartist = fartist.replace(/[^a-zA-Z0-9]/g, "_");
-    const sanitizedTitle = title.replace(/[^a-zA-Z0-9]/g, "_");
-    const ext = audioFile.name.split('.').pop() || "mp3";
-    const fileName = `${sanitizedFartist}_${sanitizedTitle}.${ext}`;
-
-    // Upload to R2
-    const bytes = await audioFile.arrayBuffer();
-    const buffer = Buffer.from(bytes);
-    const audioUrl = await uploadToR2(buffer, fileName, audioFile.type || "audio/mpeg");
 
     // Create submission record
     const submission = await prisma.submission.create({
@@ -52,7 +35,7 @@ export async function POST(request: Request) {
         bio: bio || null,
         lyrics: lyrics || null,
         audioUrl,
-        audioFileName: audioFile.name,
+        audioFileName: audioFileName || "audio.mp3",
       },
     });
 
